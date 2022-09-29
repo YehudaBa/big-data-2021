@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>AEAI | Project page for Autoencoder Image Interpolation by Shaping the Latent Space (ICML2021)</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="AEAI" />
+<meta name="author" content="Alon Oring" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Project page for Autoencoder Image Interpolation by Shaping the Latent Space (ICML2021)" />
+<meta property="og:description" content="Project page for Autoencoder Image Interpolation by Shaping the Latent Space (ICML2021)" />
+<link rel="canonical" href="https://oringa.github.io//AEAI/" />
+<meta property="og:url" content="https://oringa.github.io//AEAI/" />
+<meta property="og:site_name" content="AEAI" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="AEAI" />
+<script type="application/ld+json">
+{"description":"Project page for Autoencoder Image Interpolation by Shaping the Latent Space (ICML2021)","url":"https://oringa.github.io//AEAI/","@type":"WebSite","headline":"AEAI","name":"AEAI","author":{"@type":"Person","name":"Alon Oring"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta property='og:title' content='Autoencoder Image Interpolation by Shaping the Latent Space'/>
+    <meta property='og:image' content='https://oringa.github.io/AEAI/images/latent_intuition_new2.png'/>
+    <meta property='og:description' content='Autoencoder Image Interpolation by Shaping the Latent Space'/>
+    <meta property='og:url' content='https://oringa.github.io/AEAI/'/>
+    
+    <link rel="stylesheet" href="/AEAI/assets/css/style.css?v=b1059ecd41770958cdf689c6fd695a3b4b674986">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/AEAI/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Autoencoder Image Interpolation by Shaping the Latent Space</h1>
+      <!-- <h2 class="project-tagline" color=white><a href="website_homepage.htm">Home</a> <a href="website_hills.htm">Hills Pupil Tailored Website</a></h2> -->
+      <h2 class="project-tagline"><a href="https://www.linkedin.com/in/oringa/" style="color:#ffffff">Alon Oring</a>, <a href="https://zohary.cswp.cs.technion.ac.il/" style="color:#ffffff">Zohar Yakhini</a>, <a href="https://faculty.idc.ac.il/toky/" style="color:#ffffff">Yacov Hel-Or</a></h2>
+      <h3 class="project-tagline" style="color:#ffffff">Interdisciplinary Center Herzliya</h3>
+
+
+      
+
+
+      
+        <a href="https://proceedings.mlr.press/v139/oring21a" class="btn">View on PMLR</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <!-- The **Autoencoder Adversarial Interpolation** (AEAI) is a novel approach for the generation of admissible interpolation in manifold data and was published in [ICML2021](https://proceedings.mlr.press/v139/oring21a).
+
+This paper was written by [Alon Oring](https://www.linkedin.com/in/oringa/) under the supervision of [Prof. Zohar Yakhini](https://zohary.cswp.cs.technion.ac.il/) and [Prof. Yacov Hel-Or](https://faculty.idc.ac.il/toky/) from the Interdisciplinary Center Herzliya. -->
+
+<h2 id="abstract">Abstract</h2>
+
+<p>Autoencoders represent an effective approach for computing the underlying factors characterizing datasets of different types. The latent representation of autoencoders have been studied in the context of enabling interpolation between data points by decoding convex combinations of latent vectors. This interpolation, however, often leads to artifacts or produces unrealistic results during reconstruction.</p>
+
+<p>We argue that these incongruities are due to the structure of the latent space and because such naively interpolated latent vectors deviate from the data manifold.</p>
+
+<p>In this work, we propose a regularization technique that shapes the latent representation to follow a manifold that is consistent with the training images and that drives the manifold to be smooth and locally convex. This regularization not only enables faithful interpolation between data points, as we show herein, but can also be used as a general regularization technique to avoid overfitting or to produce new samples for data augmentation.</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<ol>
+  <li><strong>Autoencoder latent spaces are non-convex</strong>: While they represent an effective approach for exposing latent factors, autoencoders demonstrate visible artifacts while interpolating a convex sum of latent vectors.</li>
+  <li><strong>GANs are not bidirectional</strong>: To interpolate between two real data points, we must map the datapoints back into latent space where admissible interpolation can be performed. Such inverse mapping is not a part of the GAN framework. Additionally, the latent space of the GAN does not necessarily encode a smooth parameterization of the data.</li>
+</ol>
+
+<h2 id="manifold-data-interpolation">Manifold Data Interpolation</h2>
+
+<p>Before presenting the proposed approach we would like to define what constitutes a proper interpolation between two data points. There are many possible paths between two points on the manifold. Even if we require the interpolations to be on a geodesic path, there might be infinitely many such paths between two points. Therefore, we relax the geodesic requirement and define less restrictive conditions.</p>
+
+<p>Formally, assume we are given a dataset sampled from a target domain \(\cal{X}\). We are interested in interpolating between two data points \( \boldsymbol x_i \) and \( \boldsymbol x_j \) from \(\cal{X}\). Let the interpolated points be \( \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha) \) for \( \alpha \in [0,1] \) and let \(P(\boldsymbol x)\) be the probability that a data point \(\boldsymbol x\) belongs to \(\cal{X}\).</p>
+
+<p>We define an interpolation to be an <strong>admissible interpolation</strong> if \( \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha) \) satisfies the following conditions:</p>
+
+<ol>
+  <li>
+    <p><strong>Boundary conditions</strong>: \( \hat{\boldsymbol{x}}_{i \rightarrow j}(0) = \boldsymbol x_i \) and \( \hat{\boldsymbol{x}}_{i \rightarrow j}(1) = \boldsymbol x_j \)</p>
+  </li>
+  <li>
+    <p><strong>Monotonicity</strong>: We require that under some defined distance on the manifold \( d(\boldsymbol x,\boldsymbol x’) \) the interpolated points will depart from \( \boldsymbol x_i \) and approach \( \boldsymbol x_j \), as the parameterization \( \alpha \) goes from \(0\) to \(1\). Namely, \( \forall \alpha’ \geq \alpha \):</p>
+
+    <p>\[ d(\hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha), \boldsymbol x_i ) \leq d(\hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha’),\boldsymbol x_i) \]</p>
+
+    <p>and similarly:</p>
+
+    <p>\[ d( \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha’), \boldsymbol x_j ) \leq d(\hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha),\boldsymbol x_j) \]</p>
+  </li>
+  <li>
+    <p><strong>Smoothness</strong>: The interpolation function is Lipschitz continuous with a constant \(K\):</p>
+
+    <p>\[ || \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha), \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha+t) || \leq K | t | \]</p>
+  </li>
+  <li>
+    <p><strong>Credability</strong>: We require that \( \forall \alpha \in [0,1] \) it is highly probable that interpolated images, \( \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha) \) belong to \(\cal{X} \). Namely,</p>
+
+    <p>\[ P(\hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha)) \geq 1-\beta \mbox{ for some constant \(\beta \geq 0\)}  \]</p>
+  </li>
+</ol>
+
+<h2 id="proposed-approach">Proposed Approach</h2>
+
+<p>Following the above definitions for an admissible interpolation, we propose a new approach, called <strong>Autoencoder Adversarial Interpolation</strong> (AEAI), which shapes the latent space according to the above requirements.</p>
+
+<p>For pairs of input data points \( \boldsymbol{x}_i, \boldsymbol{x}_j\), we linearly interpolate between them in the latent space: \( \boldsymbol{z}_{i \rightarrow j}(\alpha) = (1-\alpha) \boldsymbol{z}_i + \alpha \boldsymbol{z}_j \), where \( \alpha \in [0,1] \).</p>
+
+<ol>
+  <li>
+    <p>The first loss term \( {\cal L}_R \) is a standard reconstruction loss and is calculated for the two endpoints \( \boldsymbol{x}_i \) and \( \boldsymbol{x}_j \):</p>
+
+    <p>\[ \cal{L}_{R}^{i \rightarrow j} = \cal{L}(\boldsymbol{x}_i,\hat{\boldsymbol{x}}_i) + \cal{L}(\boldsymbol{x}_j,\hat{\boldsymbol{x}}_j) \]
+ where \({\cal L}(\cdot,\cdot)\) is some loss function between the two images.</p>
+  </li>
+  <li>
+    <p>We use a discriminator \( D(\boldsymbol{x})\) to differentiate between real and interpolated data points to encourage the network to fool the discriminator so that interpolated images are indistinguishable from the data in the target domain \(\cal{X}\).</p>
+
+    <p>\[ \cal{L}_A^{i \rightarrow j}= \sum_{n=0}^{M} -\log D(\hat{\boldsymbol{x}}_{i \rightarrow j}(n/M)) \]</p>
+  </li>
+  <li>
+    <p>The cycle-consistency loss \(\cal{L}_C\) encourages the encoder and the decoder to produce a bijective mapping:
+ \[ \cal{L}_{C}^{i \rightarrow j}= \sum_{n=0}^{M} | \boldsymbol{z}_{i \rightarrow j}(n/M)- \hat{\boldsymbol{z}}_{i \rightarrow j}(n/M)|^2 \]</p>
+
+    <p>where \(\hat{\boldsymbol{z}}_{i \rightarrow j}(\alpha) =f(g(\boldsymbol{z}_{i \rightarrow j}(\alpha))) \).</p>
+  </li>
+  <li>
+    <p>The last term \(\cal{L}_S\) is the smoothness loss encouraging \(\hat{\boldsymbol{x}}(\alpha)\) to produce smoothly varying interpolated points between \( \boldsymbol{x}_i \) and \( \boldsymbol{x}_j\):
+ \[ \cal{L}_{S}^{i \rightarrow j}= \sum_{n=0}^M \left | {\frac{\partial \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha) }{\partial \alpha}}  \right |^2_{\alpha={n}/M} \]</p>
+  </li>
+</ol>
+
+<p>Putting everything together we define the loss \(\cal{L}_{i \rightarrow j}\) between pairs \( \boldsymbol{x}_i \) and \( \boldsymbol{x}_j\) as follows: 
+\[ \cal{L}^{i \rightarrow j} = \cal{L}_R^{i \rightarrow j} + \lambda_A \cal{L}_A^{i \rightarrow j} + \lambda_C \cal{L}_C^{i \rightarrow j} + \lambda_S \cal{L}_S^{i \rightarrow j} \]
+ where \(\cal{L}_R, \cal{L}_A, \cal{L}_C, \cal{L}_S\) are the reconstruction, adversarial, cycle, and smoothness losses, respectively.</p>
+
+<h2 id="justification-for-the-proposed-approach">Justification for the proposed approach</h2>
+
+<p>The following figure illustrates the justification for the four losses. As seen in Plot A, the images \(\boldsymbol{x}_i, \boldsymbol{x}_j\), which  lie on the data manifold in the image space (solid black curve), are mapped back to the original images thanks to the reconstruction loss \(\cal{L}_R^{i \rightarrow j}\). This loss promotes the <em>boundary conditions</em> defined above. The reconstruction loss, however, is not enough as it neither directly affects in-between points in the image space nor the interpolated points in the latent space. Introducing the adversarial loss \(\cal{L}_A^{i \rightarrow j}\) prompts the decoder \(g(\boldsymbol{z}_{i \rightarrow j}(\alpha))\) to map interpolated latent vectors back into the image manifold (Plot B). Considering the output of the discriminator \(D(\boldsymbol{x})\) as the probability of image \(\boldsymbol{x}\) to be in the target domain \(\cal{X}\) (namely, to be on the image manifold), the adversarial loss promotes the <em>credibility condition</em> defined above. As indicated in Plot B, the encoder \(f(\boldsymbol{x})\) (red arrows) might, nevertheless, still map in-between images to latent vectors that are distant from the linear line in the latent space. Adding the cycle-consistency loss \(\cal{L}_C^{i \rightarrow j}\) forces the reconstruction of interpolated latent vectors to be mapped back into the original vectors in the latent space (Plot C). The adversarial and cycle-consistency losses encourage bijective mapping (one-to-one and onto) between the input and the latent manifolds, while providing a realistic reconstruction of interpolated latent vectors.</p>
+
+<p>Lastly, the parameterization of the interpolated points, namely, \(\alpha \in [0,1]\), does not necessarily provide smooth interpolation in the image space (Plot C);
+constant velocity interpolation in the parameter \(\alpha\) may not generate smooth transitions in the image space. The smoothness loss \(\cal{L}_S^{i \rightarrow j}\) resolves this issue as it requires the distance between \(\boldsymbol{x}_i\) and \(\boldsymbol{x}_j\) to be evenly distributed along \(\alpha \in [0,1]\) (due to the \(L_2\) norm). This loss fulfills the <em>smoothness condition</em> defined above (Plot D). If we consider the latent representation as a normed space representing the manifold distance \(d(\boldsymbol{x}_i,\boldsymbol{x}_j) = |\boldsymbol{z}_i - \boldsymbol{z}_j|\), the linear interpolation in the latent space also satisfies the <em>monotonicity condition</em> defined above.</p>
+
+<p><img width="1500" alt="1" src="https://oringa.github.io/AEAI/images/latent_intuition.png" /></p>
+
+<p>Data interpolation using AEAI. Two points \(\boldsymbol{x}_i, \boldsymbol{x}_j\) are located on the input data manifold (solid black line). The encoder \( f(\boldsymbol{x})\) maps input points into the latent space \(\boldsymbol{z}_i\), \(\boldsymbol{z}_j\) (red arrows). Linear interpolation in the latent space is represented by the blue dashed line. The interpolated latent codes are mapped back into the input space by the decoder \(g(\boldsymbol{z})\) (blue arrows).</p>
+
+<h2 id="animations">Animations</h2>
+
+<p>We demonstrate that our technique (AEAI) produces admissible interpolations while other techniques fail to reconsutrct in-between images realistically or to transition smoothly from mode to mode. We tested the following techniques: <a href="https://arxiv.org/abs/1511.05644">Adversarial Autoencoder</a> (AAE), <a href="https://arxiv.org/abs/1807.07543">Adversarially Constrained Autoencoder Interpolation</a> (ACAI), <a href="https://openreview.net/forum?id=Sy2fzU9gl">\(\beta\)-Variational Autoencoder</a> (\(\beta\)-VAE), <a href="https://arxiv.org/abs/1807.06650">Generative Adversarial Interpolative Autoencoding</a> (GAIA) and <a href="https://arxiv.org/abs/1903.02709">Adversarial Mixup Resynthesis</a> (AMR).</p>
+
+<p>Each animation demonstrates the reconstruction resulting from a linear interpolation in latent space of each method between two images sampled from a testing dataset. The first two animation blocks shows objects from the COIL-100 dataset and the third block shows our synthetic pole dataset.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>AEAI</strong></th>
+      <th style="text-align: center"><strong>AAE</strong></th>
+      <th style="text-align: center"><strong>ACAI</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/aeai_chess.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/aae_chess.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/acai_chess.gif" /></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>\(\beta\)-VAE</strong></td>
+      <td style="text-align: center"><strong>GAIA</strong></td>
+      <td style="text-align: center"><strong>AMR</strong></td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/beta_chess.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/gaia_chess.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/amr_chess.gif" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr style="border:1px solid gray" />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>AEAI</strong></th>
+      <th style="text-align: center"><strong>AAE</strong></th>
+      <th style="text-align: center"><strong>ACAI</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/aeai_wood.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/aae_wood.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/acai_wood.gif" /></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>\(\beta\)-VAE</strong></td>
+      <td style="text-align: center"><strong>GAIA</strong></td>
+      <td style="text-align: center"><strong>AMR</strong></td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/beta_wood.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/gaia_wood.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/amr_wood.gif" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr style="border:1px solid gray" />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>AEAI</strong></th>
+      <th style="text-align: center"><strong>AAE</strong></th>
+      <th style="text-align: center"><strong>ACAI</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/aeai_pole.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/aae_pole.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/acai_pole.gif" /></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>\(\beta\)-VAE</strong></td>
+      <td style="text-align: center"><strong>GAIA</strong></td>
+      <td style="text-align: center"><strong>AMR</strong></td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/beta_pole.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/gaia_pole.gif" /></td>
+      <td style="text-align: center"><img width="2000" alt="1" src="https://oringa.github.io/AEAI/animations/amr_pole.gif" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="results">Results</h2>
+
+<p><img width="1500" alt="1" src="https://oringa.github.io/AEAI/images/all_res_reb.png" /></p>
+
+<p>We use the parameterization of the dataset to evaluate the reconstruction accuracy of the AAE, ACAI, \( \beta \)-VAE, AMR, GAIA and our proposed method. Upper left graph: Averaged MSE vs. \(\alpha\) values. Upper right graph: STD of MSE vs. \(\alpha\) values. Lower graph: Averaged MSE of the interpolated images vs. the interval length.
+<br />
+<br /></p>
+<hr style="border:1px solid gray" />
+
+<p><br />
+<img width="1500" alt="1" src="https://oringa.github.io/AEAI/images/iqr_all_methods_reb.png" /></p>
+
+<p>Predicting the interpolated alpha value based on the \(L_2\) distance of the interpolated image to the closest image in the dataset. The dots represent the median and the colored area corresponds to the interquartile range.
+<br />
+<br /></p>
+<hr style="border:1px solid gray" />
+
+<p><br />
+<img width="1500" alt="1" src="https://oringa.github.io/AEAI/images/source_target_reb.png" /></p>
+
+<p>We sampled two images \(\boldsymbol{x}_i, \boldsymbol{x}_j\) and linearly interpolated between them in latent space. For each interpolated image, we retrieved the closest image in terms of MSE from the dataset. The blue and orange lines present the averaged \(L_2\) distance, in the parameter space \((\theta,\phi)\), between the retrieved image and \(\boldsymbol{x}_i, \boldsymbol{x}_j\), respectively. The red lines represent perfect interpolation smoothness.</p>
+<h2 id="bibtex">BibTeX</h2>
+
+<p>If you find our work useful, please cite our paper:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@InProceedings{pmlr-v139-oring21a,
+  title = 	 {Autoencoder Image Interpolation by Shaping the Latent Space},
+  author =       {Oring, Alon and Yakhini, Zohar and Hel-Or, Yacov},
+  booktitle = 	 {Proceedings of the 38th International Conference on Machine Learning},
+  pages = 	 {8281--8290},
+  year = 	 {2021},
+  editor = 	 {Meila, Marina and Zhang, Tong},
+  volume = 	 {139},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {18--24 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v139/oring21a/oring21a.pdf},
+  url = 	 {https://proceedings.mlr.press/v139/oring21a.html}
+  }
+</code></pre></div></div>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/Oringa/AEAI">AEAI</a> is maintained by <a href="https://github.com/Oringa">Alon Oring</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
