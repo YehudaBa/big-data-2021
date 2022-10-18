@@ -84,7 +84,10 @@ This paper was written by [Nir Barazida](https://www.linkedin.com/in/nir-barazid
 <h2 id="synchronous-stochastic-gradient-descent">Synchronous stochastic gradient descent</h2>
 <p>Using distributed Synchronous Stochastic Gradient Descent (Sync-SGD), a root aggregator node splits the data into batches and fans-out requests to leaf nodes (worker machines) to process each batch and compute its gradient independently. Once all machines return their result, the root aggregator node averages the gradient and sends it back to the workers to update the model’s parameters. The root aggregator iterates over this process for a given number of epochs or based on a conversion condition.</p>      
 <ol>
-   <p><img width="500" alt="FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author" src="images/Sync-SGD-diagram.png" /></p>   
+  <div class="img-Sync-SGD-diagram">
+    <img width="500" img src="images/Sync-SGD-diagram.png" alt="FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author" />
+    <p>FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author</p>
+</div>
 </ol> 
 <h2 id="Issues">Issues</h2> 
 <p>In theory, distributing the computation onto T worker machines should give a performance improvement of xT. Yet, in reality, the performance improvement is rarely xT. The decline in efficiency is caused due to many reasons, where recent researches segment Stragglers and High-Latency as the main root cause.</p>   
@@ -94,7 +97,7 @@ This paper was written by [Nir Barazida](https://www.linkedin.com/in/nir-barazid
 <p>  
 <strong>Stragglers:</strong> 
    are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
-   [Rafal et al. (2017)](https://arxiv.org/abs/1604.00981)
+  <a href="https://arxiv.org/abs/1604.00981" style="color:#ffffff">Rafal et al. (2017)</a> []()
   conducted an experiment that calculated the time it takes to run a Sync-SGD using 100 workers and 19 parameters on the Inception model. These times are presented in Figure 2.
 </p>      
 <p><img width="500" alt="FIGURE 2: THE EFFECT OF NUMBER OF WORKERS ON THE SYNC-SGD TRAINING TIME by, [Rafal et al. (2017)](https://arxiv.org/abs/1604.00981)" src="images/cdf_time.png" /></p>
