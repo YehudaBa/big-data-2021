@@ -54,30 +54,23 @@ This paper was written by [Nir Barazida](https://www.linkedin.com/in/nir-barazid
 
 
 
-<h2 id="motivation">Motivation and background</h2>
+<h2 id="motivation-and-background">Motivation and background</h2>
 <p>In recent years, we’ve seen the power of large-scale deep learning projects. Projects like GPT-3, its open-source version — GPT-NeoX-20B, and MT-NLG- involve model and dataset sizes that would be unfathomable only a few years ago and currently dominate the state of the art. We can see exponential growth in the complexity of the models, the number of parameters, and the size of datasets. This trend raised the demand for large-scale processing to the point where it has outpaced the increase in computation power of a single machine. The need to distribute the machine learning workload across multiple machines has been raised and led to the Synchronous Distributed Training idea.</p>
+
 <ol>
-  <style>
-        .vertical {
-            border-left: 6px solid black;
-            height: 200px;
-            position:absolute;
-            left: 50%;
-        }
-    </style>
-  <strong>Note:</strong></li>
-  <li><strong>tst1</strong></li>
-      
+  <strong>Note:</strong>
+  There is a difference between distributed training and distributed inference. if a machine learning service receives a large number of requests, we need to distribute the model over several machines to accommodate the load. Scaling training, on the other hand, is when training the same model on more than one machine.
 </ol>
 
-<h2 id="manifold-data-interpolation">Manifold Data Interpolation</h2>
+<p>Synchronous stochastic gradient descent is a common way of distributing the training process of machine learning models with data parallelism. In synchronous training, a root aggregator node fans-out requests to many leaf nodes that work in parallel over different input data slices and return their results to the root node to aggregate.</p>
 
-<p>Before presenting the proposed approach we would like to define what constitutes a proper interpolation between two data points. There are many possible paths between two points on the manifold. Even if we require the interpolations to be on a geodesic path, there might be infinitely many such paths between two points. Therefore, we relax the geodesic requirement and define less restrictive conditions.</p>
+<h2 id="stochastic-gradient-descent">Stochastic Gradient Descent</h2>
 
-<p>Formally, assume we are given a dataset sampled from a target domain \(\cal{X}\). We are interested in interpolating between two data points \( \boldsymbol x_i \) and \( \boldsymbol x_j \) from \(\cal{X}\). Let the interpolated points be \( \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha) \) for \( \alpha \in [0,1] \) and let \(P(\boldsymbol x)\) be the probability that a data point \(\boldsymbol x\) belongs to \(\cal{X}\).</p>
-
-<p>We define an interpolation to be an <strong>admissible interpolation</strong> if \( \hat{\boldsymbol{x}}_{i \rightarrow j}(\alpha) \) satisfies the following conditions:</p>
-
+<p>Before we dive into the implementation details and challenges, let’s first understand what stochastic gradient descent (SGD) is. Given a dataset D and a model with θ parameters, we’d like to minimize the parameterized empirical loss function, L, for a given (x,y) pairs in D, where x denotes the input sample while y is the output.</p>
+<ol>
+      
+</ol>
+      
 <ol>
   <li>
     <p><strong>Boundary conditions</strong>: \( \hat{\boldsymbol{x}}_{i \rightarrow j}(0) = \boldsymbol x_i \) and \( \hat{\boldsymbol{x}}_{i \rightarrow j}(1) = \boldsymbol x_j \)</p>
