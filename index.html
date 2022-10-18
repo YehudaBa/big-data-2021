@@ -68,9 +68,23 @@ This paper was written by [Nir Barazida](https://www.linkedin.com/in/nir-barazid
 
 <p>Before we dive into the implementation details and challenges, let’s first understand what stochastic gradient descent (SGD) is. Given a dataset D and a model with θ parameters, we’d like to minimize the parameterized empirical loss function, L, for a given (x,y) pairs in D, where x denotes the input sample while y is the output.</p>
 <ol>
-   <p><img width="1500" alt="1" src="images/loss_function.png" /></p>   
+   <p><img width="500" alt="1" src="images/loss_function.png" /></p>   
 </ol>
- 
+      
+<p>Where l is the loss of a data point (x,y) for model θ. </p>
+<p>A first-order stochastic optimization algorithm optimizes the loss function by iteratively updating θ using a stochastic gradient. Usually, a learning rate will be applied to avoid over or underfitting, and therefore, the SGD will be calculated as follows:</p>      
+<ol>
+   <p><img width="500" alt="1" src="images/SGD.png" /></p>   
+</ol>     
+<p>where ɣ is the learning rate or step size at iteration.</p>  
+<p>A mini-batch version of the stochastic optimization algorithm computes the gradient over a mini-batch of size B instead of a single data point:</p>       
+<ol>
+   <p><img width="500" alt="1" src="images/mini_batch_size_b.png" /></p>   
+</ol>      
+<h2 id="synchronous-stochastic-gradient-descent">Synchronous stochastic gradient descent</h2>
+      
+      
+      
       
       
       
