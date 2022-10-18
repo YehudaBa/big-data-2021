@@ -68,20 +68,40 @@ This paper was written by [Nir Barazida](https://www.linkedin.com/in/nir-barazid
 
 <p>Before we dive into the implementation details and challenges, let’s first understand what stochastic gradient descent (SGD) is. Given a dataset D and a model with θ parameters, we’d like to minimize the parameterized empirical loss function, L, for a given (x,y) pairs in D, where x denotes the input sample while y is the output.</p>
 <ol>
-   <p><img width="500" alt="1" src="images/loss_function.png" /></p>   
+   <p><img width="500" src="images/loss_function.png" /></p>   
 </ol>
       
 <p>Where l is the loss of a data point (x,y) for model θ. </p>
 <p>A first-order stochastic optimization algorithm optimizes the loss function by iteratively updating θ using a stochastic gradient. Usually, a learning rate will be applied to avoid over or underfitting, and therefore, the SGD will be calculated as follows:</p>      
 <ol>
-   <p><img width="500" alt="1" src="images/SGD.png" /></p>   
+   <p><img width="500" src="images/SGD.png" /></p>   
 </ol>     
 <p>where ɣ is the learning rate or step size at iteration.</p>  
 <p>A mini-batch version of the stochastic optimization algorithm computes the gradient over a mini-batch of size B instead of a single data point:</p>       
 <ol>
-   <p><img width="500" alt="1" src="images/mini_batch_size_b.png" /></p>   
+   <p><img width="500" src="images/mini_batch_size_b.png" /></p>   
 </ol>      
 <h2 id="synchronous-stochastic-gradient-descent">Synchronous stochastic gradient descent</h2>
+<p>Using distributed Synchronous Stochastic Gradient Descent (Sync-SGD), a root aggregator node splits the data into batches and fans-out requests to leaf nodes (worker machines) to process each batch and compute its gradient independently. Once all machines return their result, the root aggregator node averages the gradient and sends it back to the workers to update the model’s parameters. The root aggregator iterates over this process for a given number of epochs or based on a conversion condition.</p>      
+<ol>
+   <p><img width="500" alt="FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author" src="images/Sync-SGD-diagram.png" /></p>   
+</ol> 
+<h2 id="Issues">Issues</h2> 
+<p>In theory, distributing the computation onto T worker machines should give a performance improvement of xT. Yet, in reality, the performance improvement is rarely xT. The decline in efficiency is caused due to many reasons, where recent researches segment Stragglers and High-Latency as the main root cause.</p>   
+ 
+      
+<h2 id="stragglers-and-high-latency-in-distributed-synchronous-sgd">Stragglers and High Latency in Distributed Synchronous SGD</h2> 
+<p>  
+<strong>Stragglers:</strong> 
+   are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
+   [Rafal et al. (2017)](https://arxiv.org/abs/1604.00981)
+  conducted an experiment that calculated the time it takes to run a Sync-SGD using 100 workers and 19 parameters on the Inception model. These times are presented in Figure 2.
+</p>      
+<p><img width="500" alt="FIGURE 2: THE EFFECT OF NUMBER OF WORKERS ON THE SYNC-SGD TRAINING TIME by, [Rafal et al. (2017)](https://arxiv.org/abs/1604.00981)" src="images/cdf_time.png" /></p>
+      
+      
+      
+      
       
       
       
