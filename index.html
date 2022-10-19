@@ -196,10 +196,26 @@ Due to those properties, as fanning out more workers, the tail of the distributi
   (Russakovsky et al., 2015).
 </p>
       
+ <div class="img-convergence">
+    <img width="500" img src="images/convergence_plots.png" alt="convergence" />
+    <p>FIGURE 6: CONVERGENCE OF SYNC-SGD AND ASYNC-SGD ON INCEPTION MODEL USING VARYING NUMBER OF MACHINES, by
+       <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
+    </p>
+</div>     
+ 
+<p>
+  From figure 6, we can see how using different numbers of workers and backup workers (N+b) has a clear effect on conversion time and rate. Figure 6 (b), shows that fanning out more workers doesn’t necessarily provide better results. When passing ~105 workers, the model’s precision decreases by ~0.3%. Moreover, In figure 6 (c) and 6 (d), the improvement slope decrease as the number of workers increases, which is reflected in the “elbow” shape.
+</p>    
+ Solutions for High Latency
+<h2 id="solutions-for-high-latency">Solutions for High Latency</h2>
       
-    
-      
-      
+<p><strong>Ring All-Reduce</strong></p>
+<p>
+The Ring All-Reduce is a well-known and used method to reduce high latency. It was adopted and incorporated into the
+<a href="https://eng.uber.com/horovod/">“Horovod“ library by Uber. style="text-decoration: underline;"</a>  
+It takes advantage of bandwidth-optimal communication algorithms without loosening synchronization constraints. This method tackles the bandwidth limitation between the root aggregator and the workers and tries to optimize it.
+</p>
+     
       
       
       
