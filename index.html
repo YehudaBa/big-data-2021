@@ -127,8 +127,12 @@ is the time it takes for data to get to its destination across the network. Due 
   Since the Sync-SGD algorithm is designed to wait until all workers return the loss function, it is sensitive to stragglers and high latency. The Sync-SGD architecture holds two defining properties:
 </p>
  <ul class="ul-1">
-    The running time is greater than or equal to the max of all workers’ running time.
- <ul>     
+    <li>The running time is greater than or equal to the max of all workers’ running time.</li>
+    <li>Workers’ running time has a lognormal distribution [3].</li>
+ <ul>
+<p>
+  Due to those properties, as fanning out more workers, the tail of the distribution gets longer, and thus the running time gets worst on average. To grasp the effect of the number of workers on the running time, I conducted an experiment where I generated 1,000 lognormal distributions (μ=3, σ=0.1) with 3 samples sizes (10, 100, 1000) where each one represents the number of workers.
+</p>  
       
       
       
