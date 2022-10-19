@@ -244,7 +244,19 @@ The Ring All-Reduce algorithm opens the bottleneck created by sending data to a 
 <ul class="ul-3">
   <li><strong>Scatter-reduce</strong>— each worker sends and receives a chunk of data from its neighbors. After the first transfer iteration is done, the workers conduct the reduced operation and then send it again to the next process in the ring. This phase finishes when each process holds the complete reduction of the chunk.</li>
   <li><strong>All-gather</strong> — each worker will replace its value with the newly received one and continue with the data transfer until each worker receives the contributions from all other workers.</li>
-</ul>       
+</ul> 
+      
+<div class="img-ring-all-reduce">
+    <img width="500" img src="images/ring_all_reduce.png" alt="ring-all-reduce" />
+    <p>
+     FIGURE 9: RING ALL-REDUCE ALGORITHM, Image by
+      <a href="https://eng.uber.com/horovod/">“Horovod“ style="text-decoration: underline;"</a>
+    </p>
+</div> 
+
+<p>
+  The Ring All-Reduce algorithm speed is independent of the number of workers, instead, it is limited by the slowest communication link between neighboring workers. The ring all-reduce algorithm is applied to Sync-SGD systems the same way as the parameter server framework, but instead of sending gradients to a single parameter server, it sends it to its neighbors.
+      </p>
 
       
       
