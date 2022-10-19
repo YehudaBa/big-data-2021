@@ -241,7 +241,10 @@ It takes advantage of bandwidth-optimal communication algorithms without looseni
 <p>
 The Ring All-Reduce algorithm opens the bottleneck created by sending data to a single parameter server in an all-to-one method. In this technique, each worker is assigned with two workers; one to send data to and another to receive from, and then runs the following steps:
 </p>
- 
+<ul class="ul-3">
+  <li><strong>Scatter-reduce</strong>— each worker sends and receives a chunk of data from its neighbors. After the first transfer iteration is done, the workers conduct the reduced operation and then send it again to the next process in the ring. This phase finishes when each process holds the complete reduction of the chunk.</li>
+  <li><strong>All-gather</strong> — each worker will replace its value with the newly received one and continue with the data transfer until each worker receives the contributions from all other workers.</li>
+</ul>       
 
       
       
