@@ -138,11 +138,40 @@ Due to those properties, as fanning out more workers, the tail of the distributi
     <img width="500" img src="images/latency_plot.png" alt="latency_plot" />
     <p>FIGURE 4: LATENCY LOGNORMAL DENSITY DISTRIBUTION</p>
 </div>
+<p>
+  Figure 4 clearly shows that as the fanout increases, the mean of the parent latency distribution gets higher with a lower variance. However, one would expect it to become exponentially worse, but it only becomes logarithmically worse, which might indicate that in some cases it’s better to fan out to more workers.
+</p>
       
+<h2 id="solutions-for-stragglers-and-high-latency-when-using-sync-sgd">Solutions for Stragglers and High Latency when using Sync-SGD</h2> 
+
+<p>
+  The “arming race” for state-of-the-art machine learning models has led the industry to develop complex systems that require heavy computing to train. When it comes to such a large scale, any delay in the training cycle sum to a significant delay in the entire training process. To meet those high requirements and reduce the iteration time, researchers from academia and industry invest considerable time and resources in refining and streamlining the training process. I’ve gathered SOTA solutions for stragglers and high latency that improves the training time when using the Sync-SGD approach.
+</p>     
+<h2 id="solutions-for-stragglers">Solutions for Stragglers</h2> 
+<p><strong>Drop Stragglers — WRONG APPROACH</strong></p> 
+<p>
+  My initial approach to solving this issue was to drop the results of the stragglers and calculate the gradient using the results from the other workers. I supported this approach using two main hypotheses:
+</p>
       
-      
-      
-      
+<ul class="ul-2">
+  <li>Low ratio of stragglers to completed tasks — As fanning out to more workers, the number of stragglers increases, however, they only accommodate the ~98th percentile, and therefore their impact will be relatively small on the gradient on average.</li>
+  <li>Reducing a small amount of data from a large-scale dataset has little effect — The Sync-SGD method is used for a large amount of data. Thus, removing the result of the small batches from the training process will have a negligible effect on the gradient on average.</li>
+</ul> 
+<p>
+  However, my intonation was proven wrong by Rafal et al. (2017). They examined the effect of dropping the results of stragglers without using backup workers. Having fewer machines implies a smaller effective mini-batch size and thus greater gradient variance, which requires more iterations for convergence.
+</p>  
+  
+<div class="img-iterations">
+    <img width="500" img src="images/iterations.png" alt="iterations" />
+    <p>FIGURE 5: NUMBER OF ITERATIONS TO CONVERGE, by 
+       <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
+    </p>
+</div>
+
+<p>
+ As shown in figure 5, the iterations needed to converge increase when reducing the number of workers we aggregate the gradient from. Thus, my approach reduces the iteration time per batch but increases the number of epochs to conversion and, therefore, the total training time.
+ </p> 
+    
       
       
       
