@@ -171,6 +171,32 @@ Due to those properties, as fanning out more workers, the tail of the distributi
 <p>
  As shown in figure 5, the iterations needed to converge increase when reducing the number of workers we aggregate the gradient from. Thus, my approach reduces the iteration time per batch but increases the number of epochs to conversion and, therefore, the total training time.
  </p> 
+<h2 id="backup-workers">Backup Workers</h2>
+<p>
+  Rafal et al. (2017) approached the straggler drawback using technics from other distributed systems
+  (<a href="https://www.ibm.com/topics/mapreduce#:~:text=MapReduce%20is%20a%20programming%20paradigm,tasks%20that%20Hadoop%20programs%20perform.">MapReduce</a>,
+  <a href="https://www.microsoft.com/en-us/research/project/dryad/">Dryad</a>,
+  <a href="https://hadoop.apache.org/">Hadoop</a>,
+  and <a href="https://spark.apache.org/">Spark</a>).
+  They choose to add b backup workers to the N workers. Once the root aggregator receives N inputs,
+  it aggregates their gradient and updates the parameters. The slowest b workers’ gradients are dropped when they arrive.
+  From figure 2, we can see that their experiment resulted in 80% of the 98th gradient arriving under 2s,
+  whereas only 30% of the final gradient did. Furthermore, the time to collect the final few gradients grows exponentially,
+  resulting in wasted idle resources and time expended to wait for the slowest gradients.
+</p>
+      
+<p>
+  As part of the research, they ran empirical comparisons of synchronous and 
+  <a href="https://arxiv.org/abs/1609.08326">Asynchronous distributed stochastic gradient descent</a>  
+  algorithms on the
+  <a href="https://cloud.google.com/tpu/docs/inception-v3-advanced">Inception model</a>  
+  (Szegedy et al., 2016) trained on 
+  <a href="https://www.image-net.org/">ImageNet Challenge dataset</a>
+  
+  (Russakovsky et al., 2015).
+</p>
+      
+      
     
       
       
