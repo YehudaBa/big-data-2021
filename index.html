@@ -129,10 +129,15 @@ is the time it takes for data to get to its destination across the network. Due 
  <ul class="ul-1">
     <li>The running time is greater than or equal to the max of all workers’ running time.</li>
     <li>Workers’ running time has a lognormal distribution [3].</li>
- <ul>
+ </ul>
 <p>
-  Due to those properties, as fanning out more workers, the tail of the distribution gets longer, and thus the running time gets worst on average. To grasp the effect of the number of workers on the running time, I conducted an experiment where I generated 1,000 lognormal distributions (μ=3, σ=0.1) with 3 samples sizes (10, 100, 1000) where each one represents the number of workers.
+Due to those properties, as fanning out more workers, the tail of the distribution gets longer, and thus the running time gets worst on average. To grasp the effect of the number of workers on the running time, I conducted an experiment where I generated 1,000 lognormal distributions (μ=3, σ=0.1) with 3 samples sizes (10, 100, 1000) where each one represents the number of workers.
 </p>  
+
+<div class="img-latency-plot">
+    <img width="500" img src="images/latency_plot.png" alt="latency_plot" />
+    <p>FIGURE 4: LATENCY LOGNORMAL DENSITY DISTRIBUTION</p>
+</div>
       
       
       
