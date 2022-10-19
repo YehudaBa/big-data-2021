@@ -100,25 +100,36 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
    are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
   <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
   conducted an experiment that calculated the time it takes to run a Sync-SGD using 100 workers and 19 parameters on the Inception model. These times are presented in Figure 2.
-</p>      
+</p>
+<ol>
 <div class="img-cdf-time">
     <img width="500" img src="images/cdf_time.png" alt="cdf_time" />
     <p>FIGURE 2: THE EFFECT OF NUMBER OF WORKERS ON THE SYNC-SGD TRAINING TIME, by
        <a href="https://arxiv.org/abs/1604.00981"> Rafal et al. (2017)</a>
     </p>
 </div> 
-      
+</ol>     
 <p>  
 <strong>Latency</strong> 
 is the time it takes for data to get to its destination across the network. Due to the high demand for strong computational power and its low supply, in many cases, the training data will not be in the same geographic location as the root aggregator and the workers, which results in high latency. Therefore, we will have to rely on the communication channel’s maximum bandwidth, which has limitations. For example, a good internet connection may provide a bandwidth of 15 megabytes per second, and a gigabit ethernet connection can provide a bandwidth of 125 megabytes per second. Those limitations can significantly reduce the iteration time when addressing large-scale data sets.
-</p>  
+</p> 
       
+<ol>    
 <div class="img-latency-map">
     <img width="500" img src="images/latency_map.png" alt="latency_map" />
     <p>FIGURE 3: NETWORK CONDITIONS ACROSS DIFFERENT CONTINENTS (LEFT) AND THE COMPARISON BETWEEN CONNECTIONS INSIDE A CLUSTER (RIGHT), 
        <a href="https://openreview.net/pdf?id=SJeuueSYDH">Image from paper</a>
     </p>
-</div> 
+</div>
+</ol>
+      
+<p>
+  Since the Sync-SGD algorithm is designed to wait until all workers return the loss function, it is sensitive to stragglers and high latency. The Sync-SGD architecture holds two defining properties:
+</p>
+ <ul class="ul-1">
+    The running time is greater than or equal to the max of all workers’ running time.
+ <ul>     
+      
       
       
       
