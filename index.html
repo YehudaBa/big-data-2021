@@ -211,7 +211,7 @@ Due to those properties, as fanning out more workers, the tail of the distributi
 <p><strong>Ring All-Reduce</strong></p>
 <p>
 The Ring All-Reduce is a well-known and used method to reduce high latency. It was adopted and incorporated into the
-<a href="https://eng.uber.com/horovod/">“Horovod“ library by Uber. style="text-decoration: underline;"</a>  
+<a href="https://eng.uber.com/horovod/"><u>“Horovod“ library by Uber.</u></a>  
 It takes advantage of bandwidth-optimal communication algorithms without loosening synchronization constraints. This method tackles the bandwidth limitation between the root aggregator and the workers and tries to optimize it.
 </p>
       
@@ -250,14 +250,17 @@ The Ring All-Reduce algorithm opens the bottleneck created by sending data to a 
     <img width="500" img src="images/ring_all_reduce.png" alt="ring-all-reduce" />
     <p>
      FIGURE 9: RING ALL-REDUCE ALGORITHM, Image by
-      <a href="https://eng.uber.com/horovod/">“Horovod“ style="text-decoration: underline;"</a>
+      <a href="https://eng.uber.com/horovod/"><u>“Horovod“</u></a>
     </p>
 </div> 
 
 <p>
   The Ring All-Reduce algorithm speed is independent of the number of workers, instead, it is limited by the slowest communication link between neighboring workers. The ring all-reduce algorithm is applied to Sync-SGD systems the same way as the parameter server framework, but instead of sending gradients to a single parameter server, it sends it to its neighbors.
       </p>
-
+<h2 id="Conclusion">Conclusion</h2>
+<p>
+  As the size of datasets and models’ complexity increases, distributed training will become more and more common in the MLOps ecosystem. As we saw, a delay in one training cycle has a high impact on the entire training process. Thus, the need to perfect the training process and reduce the time per epoch is high. If you have more ideas, questions, or thoughts — I’d love to hear about them!
+      </p>
       
       
       
