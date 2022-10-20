@@ -62,38 +62,56 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
 
 
 <h2 id="motivation-and-background">Motivation and background</h2>
-<p>In recent years, we’ve seen the power of large-scale deep learning projects. Projects like GPT-3, its open-source version — GPT-NeoX-20B, and MT-NLG- involve model and dataset sizes that would be unfathomable only a few years ago and currently dominate the state of the art. We can see exponential growth in the complexity of the models, the number of parameters, and the size of datasets. This trend raised the demand for large-scale processing to the point where it has outpaced the increase in computation power of a single machine. The need to distribute the machine learning workload across multiple machines has been raised and led to the Synchronous Distributed Training idea.</p>
+<p>In recent years, we’ve seen the power of large-scale deep learning projects. Projects like GPT-3, its open-source
+    version — GPT-NeoX-20B, and MT-NLG- involve model and dataset sizes that would be unfathomable only a few years
+    ago and currently dominate the state of the art. We can see exponential growth in the complexity of the models,
+    the number of parameters, and the size of datasets. This trend raised the demand for large-scale processing to the
+    point where it has outpaced the increase in computation power of a single machine. The need to distribute the machine
+    learning workload across multiple machines has been raised and led to the Synchronous Distributed Training idea.</p>
 
 <ol>
   <strong>Note:</strong>
-  There is a difference between distributed training and distributed inference. if a machine learning service receives a large number of requests, we need to distribute the model over several machines to accommodate the load. Scaling training, on the other hand, is when training the same model on more than one machine.
+  There is a difference between distributed training and distributed inference. if a machine learning service receives
+    a large number of requests, we need to distribute the model over several machines to accommodate the load. Scaling
+    training, on the other hand, is when training the same model on more than one machine.
 </ol>
 
-<p>Synchronous stochastic gradient descent is a common way of distributing the training process of machine learning models with data parallelism. In synchronous training, a root aggregator node fans-out requests to many leaf nodes that work in parallel over different input data slices and return their results to the root node to aggregate.</p>
+<p>Synchronous stochastic gradient descent is a common way of distributing the training process of machine learning
+    models with data parallelism. In synchronous training, a root aggregator node fans-out requests to many leaf nodes
+    that work in parallel over different input data slices and return their results to the root node to aggregate.</p>
 
 <h2 id="stochastic-gradient-descent">Stochastic Gradient Descent</h2>
 
-<p>Before we dive into the implementation details and challenges, let’s first understand what stochastic gradient descent (SGD) is. Given a dataset D and a model with θ parameters, we’d like to minimize the parameterized empirical loss function, L, for a given (x,y) pairs in D, where x denotes the input sample while y is the output.</p>
+<p>Before we dive into the implementation details and challenges, let’s first understand what stochastic gradient
+    descent (SGD) is. Given a dataset D and a model with θ parameters, we’d like to minimize the parameterized empirical
+    loss function, L, for a given (x,y) pairs in D, where x denotes the input sample while y is the output.</p>
 <ol>
-   <p><img width="500" src="images/loss_function.png" /></p>   
+   <center><p><img width="500" src="images/loss_function.png" /></p></center>
 </ol>
       
 <p>Where l is the loss of a data point (x,y) for model θ. </p>
-<p>A first-order stochastic optimization algorithm optimizes the loss function by iteratively updating θ using a stochastic gradient. Usually, a learning rate will be applied to avoid over or underfitting, and therefore, the SGD will be calculated as follows:</p>      
+<p>A first-order stochastic optimization algorithm optimizes the loss function by iteratively updating θ using a
+    stochastic gradient. Usually, a learning rate will be applied to avoid over or underfitting, and therefore,
+    the SGD will be calculated as follows:</p>
 <ol>
-   <p><img width="500" src="images/SGD.png" /></p>   
+   <center><center><p><img width="500" src="images/SGD.png" /></p></center>
 </ol>     
-<p>where ɣ is the learning rate or step size at iteration.</p>  
-<p>A mini-batch version of the stochastic optimization algorithm computes the gradient over a mini-batch of size B instead of a single data point:</p>       
+<p>where ɣ is the learning rate or step size at iteration.</p>
+<p>A mini-batch version of the stochastic optimization algorithm computes the gradient over a mini-batch of size B
+    instead of a single data point:</p>
 <ol>
-   <p><img width="500" src="images/mini_batch_size_b.png" /></p>   
+   <center><p><img width="500" src="images/mini_batch_size_b.png" /></p></center>
 </ol>      
 <h2 id="synchronous-stochastic-gradient-descent">Synchronous stochastic gradient descent</h2>
-<p>Using distributed Synchronous Stochastic Gradient Descent (Sync-SGD), a root aggregator node splits the data into batches and fans-out requests to leaf nodes (worker machines) to process each batch and compute its gradient independently. Once all machines return their result, the root aggregator node averages the gradient and sends it back to the workers to update the model’s parameters. The root aggregator iterates over this process for a given number of epochs or based on a conversion condition.</p>      
+<p>Using distributed Synchronous Stochastic Gradient Descent (Sync-SGD), a root aggregator node splits the data into
+    batches and fans-out requests to leaf nodes (worker machines) to process each batch and compute its gradient
+    independently. Once all machines return their result, the root aggregator node averages the gradient and sends
+    it back to the workers to update the model’s parameters. The root aggregator iterates over this process for a given
+    number of epochs or based on a conversion condition.</p>
 <ol>
   <center><div class="img-Sync-SGD-diagram">
-    <img width="500" img src="images/Sync-SGD-diagram.png" alt="FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author" />
-    <p>FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author</p>
+    <img width="500" img src="images/Sync-SGD-diagram.png" alt="FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW" />
+    <p>FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW</p>
 </div></center>
 </ol> 
 <h2 id="Issues">Issues</h2> 
@@ -103,17 +121,19 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
  
       
 <p>
-Stragglers are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
+Stragglers are tasks that run much slower than other workers. Slow stragglers may result from failing hardware,
+    contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
   <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
-  conducted an experiment that calculated the time it takes to run a Sync-SGD using 100 workers and 19 parameters on the Inception model. These times are presented in Figure 2.
+  conducted an experiment that calculated the time it takes to run a Sync-SGD using 100 workers and 19 parameters on
+    the Inception model. These times are presented in Figure 2.
 </p>
 <ol>
-<div class="img-cdf-time">
+<center><div class="img-cdf-time">
     <img width="500" img src="images/cdf_time.png" alt="cdf_time" />
     <p>FIGURE 2: THE EFFECT OF NUMBER OF WORKERS ON THE SYNC-SGD TRAINING TIME, by
        <a href="https://arxiv.org/abs/1604.00981"> Rafal et al. (2017)</a>
     </p>
-</div> 
+</div></center>
 </ol>     
       
  
@@ -131,23 +151,28 @@ Stragglers are tasks that run much slower than other workers. Slow stragglers ma
 
 <h3 id="drop-stragglers">drop-stragglers</h3> 
 <p>
-  Our initial approach to solving this issue was to drop the results of the stragglers and calculate the gradient using the results from the other workers. I supported this approach using two main hypotheses:
+  Our initial approach to solving this issue was to drop the results of the stragglers and calculate the gradient using
+    the results from the other workers. I supported this approach using two main hypotheses:
 </p>
       
 <ul class="ul-2">
-  <li>Low ratio of stragglers to completed tasks — As fanning out to more workers, the number of stragglers increases, however, they only accommodate the ~98th percentile, and therefore their impact will be relatively small on the gradient on average.</li>
-  <li>Reducing a small amount of data from a large-scale dataset has little effect — The Sync-SGD method is used for a large amount of data. Thus, removing the result of the small batches from the training process will have a negligible effect on the gradient on average.</li>
+  <li>Low ratio of stragglers to completed tasks — As fanning out to more workers, the number of stragglers increases,
+      however, they only accommodate the ~98th percentile, and therefore their impact will be relatively small on the gradient on average.</li>
+  <li>Reducing a small amount of data from a large-scale dataset has little effect — The Sync-SGD method is used for a
+      large amount of data. Thus, removing the result of the small batches from the training process will have a negligible effect on the gradient on average.</li>
 </ul> 
 <p>
-  However, our intonation was proven wrong by Rafal et al. (2017). They examined the effect of dropping the results of stragglers without using backup workers. Having fewer machines implies a smaller effective mini-batch size and thus greater gradient variance, which requires more iterations for convergence.
+  However, our intonation was proven wrong by Rafal et al. (2017). They examined the effect of dropping the results of
+    stragglers without using backup workers. Having fewer machines implies a smaller effective mini-batch size and thus
+    greater gradient variance, which requires more iterations for convergence.
 </p>  
   
-<div class="img-iterations">
+<center><div class="img-iterations">
     <img width="500" img src="images/iterations.png" alt="iterations" />
     <p>FIGURE 5: NUMBER OF ITERATIONS TO CONVERGE, by 
        <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
     </p>
-</div>
+</div></center>
 
 <p>
  As shown in figure 5, the iterations needed to converge increase when reducing the number of workers we aggregate the gradient from. Thus,
@@ -178,20 +203,26 @@ Stragglers are tasks that run much slower than other workers. Slow stragglers ma
   (Russakovsky et al., 2015).
 </p>
       
- <div class="img-convergence">
+ <center><div class="img-convergence">
     <img width="500" img src="images/convergence_plots.png" alt="convergence" />
     <p>FIGURE 6: CONVERGENCE OF SYNC-SGD AND ASYNC-SGD ON INCEPTION MODEL USING VARYING NUMBER OF MACHINES, by
        <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
     </p>
-</div>     
+</div></center>
  
 <p>
-  From figure 6, we can see how using different numbers of workers and backup workers (N+b) has a clear effect on conversion time and rate. Figure 6 (b), shows that fanning out more workers doesn’t necessarily provide better results. When passing ~105 workers, the model’s precision decreases by ~0.3%. Moreover, In figure 6 (c) and 6 (d), the improvement slope decrease as the number of workers increases, which is reflected in the “elbow” shape.
+  From figure 6, we can see how using different numbers of workers and backup workers (N+b) has a clear effect on
+    conversion time and rate. Figure 6 (b), shows that fanning out more workers doesn’t necessarily provide better
+    results. When passing ~105 workers, the model’s precision decreases by ~0.3%. Moreover, In figure 6 (c) and 6 (d),
+    the improvement slope decrease as the number of workers increases, which is reflected in the “elbow” shape.
 </p>    
 
 <h2 id="Conclusion">Conclusion</h2>
 <p>
-  As the size of datasets and models’ complexity increases, distributed training will become more and more common in the MLOps ecosystem. As we saw, a delay in one training cycle has a high impact on the entire training process. Thus, the need to perfect the training process and reduce the time per epoch is high. If you have more ideas, questions, or thoughts — I’d love to hear about them!
+  As the size of datasets and models’ complexity increases, distributed training will become more and more common in
+    the MLOps ecosystem. As we saw, a delay in one training cycle has a high impact on the entire training process.
+    Thus, the need to perfect the training process and reduce the time per epoch is high. If you have more ideas,
+    questions, or thoughts — I’d love to hear about them!
       </p>
       
       
