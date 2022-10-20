@@ -8,8 +8,8 @@
 <meta name="generator" content="Jekyll v3.9.0" />
 <meta name="author" content="Yehuda Baharav" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Project page for Distributed training of deep learning models: handling stragglers and latency in synchronous training" />
-<meta property="og:description" content="Project page for Distributed training of deep learning models: handling stragglers and latency in synchronous training" />
+<meta name="description" content="Distributed training of deep learning models: handling stragglers in synchronous training" />
+<meta property="og:description" content="Distributed training of deep learning models: handling stragglers in synchronous training" />
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -18,8 +18,8 @@
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <meta property='og:title' content='Distributed training of deep learning models: handling stragglers and latency in synchronous training'/>
-    <meta property='og:description' content='Distributed training of deep learning models: handling stragglers and latency in synchronous training'/>
+    <meta property='og:title' content='Distributed training of deep learning models: handling stragglers in synchronous training'/>
+    <meta property='og:description' content='Distributed training of deep learning models: handling stragglers in synchronous training'/>
     
     <link rel="stylesheet" href="stylesheet.css">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
@@ -37,7 +37,7 @@
     <a id="skip-to-content" href="#content">Skip to the content.</a>
 
     <header class="page-header" role="banner">
-      <h1 class="project-name">Distributed training of deep learning models: handling stragglers and latency in synchronous training</h1>
+      <h1 class="project-name">Distributed Training of Deep Learning Models: Handling Stragglers in Synchronous Training</h1>
       <!-- <h2 class="project-tagline" color=white><a href="website_homepage.htm">Home</a> <a href="website_hills.htm">Hills Pupil Tailored Website</a></h2> -->
       <h2 class="project-tagline"><a href="https://www.linkedin.com/in/nir-barazida/"  style="color:#ffffff">Nir Barazida</a>, <a href="https://www.linkedin.com/in/yehuda-baharav/"  style="color:#ffffff">Yehuda Baharav</a></h2>
       <h3 class="project-tagline" style="color:#ffffff">Reichman University</h3>   
@@ -46,7 +46,7 @@
     <main id="content" class="main-content" role="main">
 
 This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Nir Barazida</a> and
-      <a href="https://www.linkedin.com/in/yehuda-baharav/">Yehuda Baharav</a> from Reichman University. 
+      <a href="https://www.linkedin.com/in/yehuda-baharav/">Yehuda Baharav</a> from Reichman University.
 
 <h2 id="abstract">Abstract</h2>
 
@@ -91,19 +91,19 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
 <h2 id="synchronous-stochastic-gradient-descent">Synchronous stochastic gradient descent</h2>
 <p>Using distributed Synchronous Stochastic Gradient Descent (Sync-SGD), a root aggregator node splits the data into batches and fans-out requests to leaf nodes (worker machines) to process each batch and compute its gradient independently. Once all machines return their result, the root aggregator node averages the gradient and sends it back to the workers to update the model’s parameters. The root aggregator iterates over this process for a given number of epochs or based on a conversion condition.</p>      
 <ol>
-  <div class="img-Sync-SGD-diagram">
+  <center><div class="img-Sync-SGD-diagram">
     <img width="500" img src="images/Sync-SGD-diagram.png" alt="FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author" />
     <p>FIGURE 1: DISTRIBUTED SYNCHRONOUS STOCHASTIC GRADIENT DESCENT FLOW, Image by author</p>
-</div>
+</div></center>
 </ol> 
 <h2 id="Issues">Issues</h2> 
-<p>In theory, distributing the computation onto T worker machines should give a performance improvement of xT. Yet, in reality, the performance improvement is rarely xT. The decline in efficiency is caused due to many reasons, where recent researches segment Stragglers and High-Latency as the main root cause.</p>   
+<p>In theory, distributing the computation onto T worker machines should give a performance improvement of xT. Yet, in
+    reality, the performance improvement is rarely xT. The decline in efficiency is caused due to many reasons, where
+    recent researches segment Stragglers= as the main root cause.</p>
  
       
-<h2 id="stragglers-in-distributed-synchronous-sgd">Stragglers and High Latency in Distributed Synchronous SGD</h2> 
-<p>  
-<strong>Stragglers:</strong> 
-   are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
+<p>
+Stragglers are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
   <a href="https://arxiv.org/abs/1604.00981">Rafal et al. (2017)</a>
   conducted an experiment that calculated the time it takes to run a Sync-SGD using 100 workers and 19 parameters on the Inception model. These times are presented in Figure 2.
 </p>
@@ -119,7 +119,7 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
  
 
      
-<h2 id="solutions-for-stragglers-when-using-sync-sgd">Solutions for Stragglers and High Latency when using Sync-SGD</h2> 
+<h2 id="solutions">Solutions</h2>
 
 <p>
   The “arming race” for state-of-the-art machine learning models has led the industry to develop complex systems that require heavy computing to train.
