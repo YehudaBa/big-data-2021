@@ -50,7 +50,14 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
 
 <h2 id="abstract">Abstract</h2>
 
-<p>Synchronous distributed training is a common way of distributing the training process of machine learning models with data parallelism. In synchronous training, a root aggregator node fans-out requests to many leaf nodes that work in parallel over different input data slices and return their results to the root node to aggregate. The latency of the leaf nodes greatly affects the efficiency of this architecture, and when scaling the number of parameters and data points, it can dramatically increase the training time. In this blog, I’ll explore the Synchronous Stochastic Gradient Descent (Sync-SGD) method to distribute the training process of deep learning models. I’ll focus my work on the effect of stragglers and high latency on its efficiency and research for methods and techniques to overcome those challenges.</p>
+<p>
+  Synchronous distributed training is a common way of distributing the training process of machine learning models with data parallelism. 
+  In synchronous training, a root aggregator node fans-out requests to many leaf nodes that work in parallel 
+  over different input data slices and return their results to the root node to aggregate. Stragglers greatly affect the efficiency of this architecture,
+  and when scaling the number of parameters and data points, it can dramatically increase the training time. In this project,
+  we'll explore the Synchronous stochastic gradient descent method to distribute the training process of deep learning models.
+  We’ll focus our work on the effect of stragglers on their efficiency and research methods and techniques to overcome those challenges.
+</p>
 
 
 
@@ -93,7 +100,7 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
 <p>In theory, distributing the computation onto T worker machines should give a performance improvement of xT. Yet, in reality, the performance improvement is rarely xT. The decline in efficiency is caused due to many reasons, where recent researches segment Stragglers and High-Latency as the main root cause.</p>   
  
       
-<h2 id="stragglers-and-high-latency-in-distributed-synchronous-sgd">Stragglers and High Latency in Distributed Synchronous SGD</h2> 
+<h2 id="stragglers-in-distributed-synchronous-sgd">Stragglers and High Latency in Distributed Synchronous SGD</h2> 
 <p>  
 <strong>Stragglers:</strong> 
    are tasks that run much slower than other workers. Slow stragglers may result from failing hardware, contention on shared underlying hardware resources in data centers, or even preemption by other jobs.
@@ -108,48 +115,23 @@ This paper was written by <a href="https://www.linkedin.com/in/nir-barazida/">Ni
     </p>
 </div> 
 </ol>     
-<p>  
-<strong>Latency</strong> 
-is the time it takes for data to get to its destination across the network. Due to the high demand for strong computational power and its low supply, in many cases, the training data will not be in the same geographic location as the root aggregator and the workers, which results in high latency. Therefore, we will have to rely on the communication channel’s maximum bandwidth, which has limitations. For example, a good internet connection may provide a bandwidth of 15 megabytes per second, and a gigabit ethernet connection can provide a bandwidth of 125 megabytes per second. Those limitations can significantly reduce the iteration time when addressing large-scale data sets.
-</p> 
       
-<ol>    
-<div class="img-latency-map">
-    <img width="500" img src="images/latency_map.png" alt="latency_map" />
-    <p>FIGURE 3: NETWORK CONDITIONS ACROSS DIFFERENT CONTINENTS (LEFT) AND THE COMPARISON BETWEEN CONNECTIONS INSIDE A CLUSTER (RIGHT), 
-       <a href="https://openreview.net/pdf?id=SJeuueSYDH">Image from paper</a>
-    </p>
-</div>
-</ol>
-      
-<p>
-  Since the Sync-SGD algorithm is designed to wait until all workers return the loss function, it is sensitive to stragglers and high latency. The Sync-SGD architecture holds two defining properties:
-</p>
- <ul class="ul-1">
-    <li>The running time is greater than or equal to the max of all workers’ running time.</li>
-    <li>Workers’ running time has a lognormal distribution [3].</li>
- </ul>
-<p>
-Due to those properties, as fanning out more workers, the tail of the distribution gets longer, and thus the running time gets worst on average. To grasp the effect of the number of workers on the running time, I conducted an experiment where I generated 1,000 lognormal distributions (μ=3, σ=0.1) with 3 samples sizes (10, 100, 1000) where each one represents the number of workers.
-</p>  
+ 
 
-<div class="img-latency-plot">
-    <img width="500" img src="images/latency_plot.png" alt="latency_plot" />
-    <p>FIGURE 4: LATENCY LOGNORMAL DENSITY DISTRIBUTION</p>
-</div>
-<p>
-  Figure 4 clearly shows that as the fanout increases, the mean of the parent latency distribution gets higher with a lower variance. However, one would expect it to become exponentially worse, but it only becomes logarithmically worse, which might indicate that in some cases it’s better to fan out to more workers.
-</p>
-      
-<h2 id="solutions-for-stragglers-and-high-latency-when-using-sync-sgd">Solutions for Stragglers and High Latency when using Sync-SGD</h2> 
+     
+<h2 id="solutions-for-stragglers-when-using-sync-sgd">Solutions for Stragglers and High Latency when using Sync-SGD</h2> 
 
 <p>
-  The “arming race” for state-of-the-art machine learning models has led the industry to develop complex systems that require heavy computing to train. When it comes to such a large scale, any delay in the training cycle sum to a significant delay in the entire training process. To meet those high requirements and reduce the iteration time, researchers from academia and industry invest considerable time and resources in refining and streamlining the training process. I’ve gathered SOTA solutions for stragglers and high latency that improves the training time when using the Sync-SGD approach.
+  The “arming race” for state-of-the-art machine learning models has led the industry to develop complex systems that require heavy computing to train.
+  When it comes to such a large scale, any delay in the training cycle sum to a significant delay in the entire training process.
+  To meet those high requirements and reduce the iteration time, researchers from academia and industry invest considerable time and
+  resources in refining and streamlining the training process. we’ve gathered SOTA solutions for stragglers that
+  improves the training time when using the Sync-SGD approach.
 </p>     
-<h2 id="solutions-for-stragglers">Solutions for Stragglers</h2> 
-<p><strong>Drop Stragglers — WRONG APPROACH</strong></p> 
+
+<h3 id="drop-stragglers">drop-stragglers</h3> 
 <p>
-  My initial approach to solving this issue was to drop the results of the stragglers and calculate the gradient using the results from the other workers. I supported this approach using two main hypotheses:
+  Our initial approach to solving this issue was to drop the results of the stragglers and calculate the gradient using the results from the other workers. I supported this approach using two main hypotheses:
 </p>
       
 <ul class="ul-2">
@@ -157,7 +139,7 @@ Due to those properties, as fanning out more workers, the tail of the distributi
   <li>Reducing a small amount of data from a large-scale dataset has little effect — The Sync-SGD method is used for a large amount of data. Thus, removing the result of the small batches from the training process will have a negligible effect on the gradient on average.</li>
 </ul> 
 <p>
-  However, my intonation was proven wrong by Rafal et al. (2017). They examined the effect of dropping the results of stragglers without using backup workers. Having fewer machines implies a smaller effective mini-batch size and thus greater gradient variance, which requires more iterations for convergence.
+  However, our intonation was proven wrong by Rafal et al. (2017). They examined the effect of dropping the results of stragglers without using backup workers. Having fewer machines implies a smaller effective mini-batch size and thus greater gradient variance, which requires more iterations for convergence.
 </p>  
   
 <div class="img-iterations">
@@ -168,9 +150,10 @@ Due to those properties, as fanning out more workers, the tail of the distributi
 </div>
 
 <p>
- As shown in figure 5, the iterations needed to converge increase when reducing the number of workers we aggregate the gradient from. Thus, my approach reduces the iteration time per batch but increases the number of epochs to conversion and, therefore, the total training time.
+ As shown in figure 5, the iterations needed to converge increase when reducing the number of workers we aggregate the gradient from. Thus,
+  our approach reduces the iteration time per batch but increases the number of epochs to conversion and, therefore, the total training time.
  </p> 
-<h2 id="backup-workers">Backup Workers</h2>
+<h3 id="backup-workers">Backup Workers</h3>
 <p>
   Rafal et al. (2017) approached the straggler drawback using technics from other distributed systems
   (<a href="https://www.ibm.com/topics/mapreduce#:~:text=MapReduce%20is%20a%20programming%20paradigm,tasks%20that%20Hadoop%20programs%20perform.">MapReduce</a>,
@@ -205,57 +188,7 @@ Due to those properties, as fanning out more workers, the tail of the distributi
 <p>
   From figure 6, we can see how using different numbers of workers and backup workers (N+b) has a clear effect on conversion time and rate. Figure 6 (b), shows that fanning out more workers doesn’t necessarily provide better results. When passing ~105 workers, the model’s precision decreases by ~0.3%. Moreover, In figure 6 (c) and 6 (d), the improvement slope decrease as the number of workers increases, which is reflected in the “elbow” shape.
 </p>    
-<h2 id="solutions-for-high-latency">Solutions for High Latency</h2>
-      
-<p><strong>Ring All-Reduce</strong></p>
-<p>
-The Ring All-Reduce is a well-known and used method to reduce high latency. It was adopted and incorporated into the
-<a href="https://eng.uber.com/horovod/"><u>“Horovod“ library by Uber.</u></a>  
-It takes advantage of bandwidth-optimal communication algorithms without loosening synchronization constraints. This method tackles the bandwidth limitation between the root aggregator and the workers and tries to optimize it.
-</p>
-      
-<p>
-  To better understand how the Ring All-Reduce works, we’ll start by exploring the All-Reduce method. The All-Reduce algorithm has every worker share its parameters with all other workers and applies a reduction operation (e.g., sum, multiplication, max, or min). The All-Reduce algorithm is implemented in a variety of ways. Some aim to cut down on bandwidth, while others try to cut down on latency.
-</p>
-      
-      
- <div class="img-all-reduce">
-    <img width="500" img src="images/all_reduce.png" alt="all-reduce" />
-    <p>FIGURE 7: ALL-REDUCE, by
-       <a href="https://www.researchgate.net/publication/259239833_Sparse_Allreduce_Efficient_Scalable_Communication_for_Power-Law_Data">Huasha et al. (2013)</a>
-    </p>
-</div>  
-      
-<p>
-  As shown in figure 4, when increasing the number of workers, we see the long tail phenomena of latency. On top of that, when using the naive communication method between the root aggregator and the workers to transfer data, the communication cost increased linearly with the number of workers.
-</p>
-      
-<div class="img-synchronous-distributed">
-    <img width="500" img src="images/Synchronous_Distributed.png" alt="synchronous-distributed" />
-    <p>
-     FIGURE 8: SYNCHRONOUS DISTRIBUTED TRAINING
-    </p>
-</div>       
 
-<p>
-The Ring All-Reduce algorithm opens the bottleneck created by sending data to a single parameter server in an all-to-one method. In this technique, each worker is assigned with two workers; one to send data to and another to receive from, and then runs the following steps:
-</p>
-<ul class="ul-3">
-  <li><strong>Scatter-reduce</strong>— each worker sends and receives a chunk of data from its neighbors. After the first transfer iteration is done, the workers conduct the reduced operation and then send it again to the next process in the ring. This phase finishes when each process holds the complete reduction of the chunk.</li>
-  <li><strong>All-gather</strong> — each worker will replace its value with the newly received one and continue with the data transfer until each worker receives the contributions from all other workers.</li>
-</ul> 
-      
-<div class="img-ring-all-reduce">
-    <img width="500" img src="images/ring_all_reduce.png" alt="ring-all-reduce" />
-    <p>
-     FIGURE 9: RING ALL-REDUCE ALGORITHM, Image by
-      <a href="https://eng.uber.com/horovod/"><u>“Horovod“</u></a>
-    </p>
-</div> 
-
-<p>
-  The Ring All-Reduce algorithm speed is independent of the number of workers, instead, it is limited by the slowest communication link between neighboring workers. The ring all-reduce algorithm is applied to Sync-SGD systems the same way as the parameter server framework, but instead of sending gradients to a single parameter server, it sends it to its neighbors.
-      </p>
 <h2 id="Conclusion">Conclusion</h2>
 <p>
   As the size of datasets and models’ complexity increases, distributed training will become more and more common in the MLOps ecosystem. As we saw, a delay in one training cycle has a high impact on the entire training process. Thus, the need to perfect the training process and reduce the time per epoch is high. If you have more ideas, questions, or thoughts — I’d love to hear about them!
